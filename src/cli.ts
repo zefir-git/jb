@@ -8,6 +8,12 @@ const args = process.argv.slice(2);
 const label = process.argv[1];
 const info = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf8"));
 
+const format = {
+	bold: "\x1b[1m",
+	underline: "\x1b[4m",
+	reset: "\x1b[0m",
+};
+
 if (args.length === 0) {
 	help();
 	process.exit(0);
@@ -78,7 +84,7 @@ async function all(file?: string) {
 		data = (!file || file === "-" ? await readStdin() : await fs.readFile(file)).toString().trim()
 	}
 	catch (e: any) {
-		return console.error("error:", e.message);
+		return console.error("${format.bold}error:${format.reset}", e.message);
 	}
 	if (data === "") return json([]);
 	let servers = data.split("\n").map(line => new LicenseServer(new URL(line.trim())));
@@ -100,7 +106,7 @@ async function proxy(port?: string) {
 		tokens = (await fs.readFile(options.proxyTokens, "utf8")).trim().split("\n");
 	}
 	catch (e: any) {
-		return console.error("error:", e.message);
+		return console.error("${format.bold}error:${format.reset}", e.message);
 	}
 
 	if (options.proxyServers === undefined) return missingArgument("--servers");
@@ -108,16 +114,16 @@ async function proxy(port?: string) {
 	try {
 		const d = (!options.proxyServers || options.proxyServers === "-" ? await readStdin() : await fs.readFile(options.proxyServers, "utf8")).toString().trim();
 		if (!d) {
-			console.error("error: no servers were provided");
+			console.error("${format.bold}error:${format.reset} no servers were provided");
 			process.exit(1);
 		}
 		servers = d.split("\n").map(line => new LicenseServer(new URL(line.trim())));
 	}
 	catch (e: any) {
-		return console.error("error:", e.message);
+		return console.error("${format.bold}error:${format.reset}", e.message);
 	}
 	if (servers.length === 0) {
-		console.error("error: no servers were provided");
+		console.error("${format.bold}error:${format.reset} no servers were provided");
 		process.exit(1);
 	}
 
@@ -126,7 +132,7 @@ async function proxy(port?: string) {
 		proxyServer.start().then();
 	}
 	catch (e: any) {
-		return console.error("error:", e.message);
+		return console.error("${format.bold}error:${format.reset}", e.message);
 	}
 	process.on("SIGINT", async () => {
 		await proxyServer.stop();
@@ -141,37 +147,37 @@ function version () {
 function help () {
 	console.log(`A command line tool for detecting JetBrains license servers.
 
-Usage:	${label} [options]
+${format.bold}${format.underline}Usage:${format.reset} ${format.bold}${label}${format.reset} [options]
 
-Options:
-  -c, --check <url>
+${format.bold}${format.underline}Options:${format.reset}
+  ${format.bold}-c, --check${format.reset} <url>
           Check a license server. Outputs JSON.
-  -a, --check-all [file]
+  ${format.bold}-a, --check-all${format.reset} [file]
           Check a list of license servers (separated by new line). Outputs JSON.
           Use '-' for standard input.
-      --available
+      ${format.bold}--available${format.reset}
           When using --check-all, output only available servers
-      --online
+      ${format.bold}--online${format.reset}
           When using --check-all, output only online servers
-      --newline
+      ${format.bold}--newline${format.reset}
           When using --check-all, output only server URLs separated by new line
-  -p, --proxy [port]
+  ${format.bold}-p, --proxy${format.reset} [port]
           Create an HTTP proxy that uses the fastest available license server.
           The default port is 8080.
-      --servers [file]
+      ${format.bold}--servers${format.reset} [file]
           List of license servers (separated by new line) for the proxy to check
           and use. This is required when using --proxy.
           Use '-' for standard input.
-      --tokens <file>
+      ${format.bold}--tokens${format.reset} <file>
           List of access tokens used for accessing the proxy (separated by new
           line). If set, to use the server you need to add a token in the path
           when adding it in your IDE, like so:
               http://localhost:8080/<token>
-  -v, --version
+  ${format.bold}-v, --version${format.reset}
           Print version
-  -f, --format <number>
+  ${format.bold}-f, --format${format.reset} <number>
           Format JSON output spaces (default: 2)
-  -h, --help
+  ${format.bold}-h, --help${format.reset}
           Print help`);
 }
 
@@ -181,21 +187,21 @@ function json(data: any) {
 }
 
 function missingValue(argument: string) {
-	console.error(`error: a value is required for '${argument}' but none was supplied
+	console.error(`${format.bold}error:${format.reset} a value is required for '${argument}' but none was supplied
 
 For more information, try '--help'.`)
 	process.exit(1);
 }
 
 function missingArgument(argument: string) {
-	console.error(`error: argument '${argument}' is required but was not supplied
+	console.error(`${format.bold}error:${format.reset} argument '${argument}' is required but was not supplied
 
 For more information, try '--help'.`)
 	process.exit(1);
 }
 
 function unexpectedArgument(argument: string) {
-	console.error(`error: unexpected argument '${argument}' found`);
+	console.error(`${format.bold}error:${format.reset} unexpected argument '${argument}' found`);
 	process.exit(1);
 }
 
