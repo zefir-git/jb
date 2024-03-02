@@ -19,10 +19,13 @@ export default class LicenseServer {
                 "-c",
                 `awk "NR==$(od -N3 -An -i /dev/urandom | awk -v f=0 -v r="$(cat /usr/share/dict/words | wc -l)" '{printf "%i\\n", f + r * $1 / 16777216}')" /usr/share/dict/words`
             ]);
-            cp.stdout.on("data", data => {
-                resolve(data.toString().trim());
+            cp.stdout.on("data", data => resolve(data.toString().trim()));
+            const fallback = crypto.randomUUID().split("-")[0]!;
+            cp.on("error", () => resolve(fallback));
+            cp.on("exit", code => {
+                if (code !== 0) resolve(fallback);
             });
-            cp.on("error", () => resolve(crypto.randomUUID().split("-")[0]!));
+            cp.stderr.on("data", () => resolve(fallback));
         });
     }
     public constructor(public readonly url: URL) {}
