@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
+import path from "node:path";
 import LicenseServer from "./LicenseServer";
 import Proxy from "./Proxy";
 import ServerManager from "./ServerManager";
 
 const args = process.argv.slice(2);
-const label = process.argv[1];
+const label = path.basename(process.argv[1]!);
 const info = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf8"));
 
 const format = {
