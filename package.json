@@ -1,13 +1,13 @@
 {
   "name": "jb",
-  "version": "1.0.0",
+  "version": "0.0.0-dev",
   "description": "",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node dist/cli.mjs",
     "bundle": "webpack && chmod +x dist/cli.mjs",
-    "package": "npm run bundle && tar -cvzf jb-$(npm start --silent -- -v).tgz -C dist ."
+    "package": "npm run bundle && tar -cvzf jb-v$(npm start --silent -- -v).tgz -C dist ."
   },
   "keywords": [],
   "author": "",
