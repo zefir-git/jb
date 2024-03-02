@@ -1,11 +1,14 @@
 {
-  "name": "proj",
+  "name": "jb",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "private": true,
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "./dist/cli.js",
+    "build": "tsc",
+    "package": "npm run build && tar -cvzf jb-$(npm start --silent -- -v).tgz package.json dist LICENSE"
   },
   "keywords": [],
   "author": "",
