@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
-import LicenseServer from "./LicenseServer.js";
-import Proxy from "./Proxy.js";
-import ServerManager from "./ServerManager.js";
-
-process.env.NODE_ENV = "production";
+import LicenseServer from "./LicenseServer";
+import Proxy from "./Proxy";
+import ServerManager from "./ServerManager";
 
 const args = process.argv.slice(2);
 const label = process.argv[1];

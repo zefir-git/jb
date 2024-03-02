@@ -2,21 +2,23 @@
   "name": "jb",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "./dist/cli.js",
-    "build": "tsc",
-    "package": "npm run build && tar -cvzf jb-$(npm start --silent -- -v).tgz package.json dist LICENSE"
+    "start": "node dist/cli.mjs",
+    "bundle": "webpack && chmod +x dist/cli.mjs",
+    "package": "npm run bundle && tar -cvzf jb-$(npm start --silent -- -v).tgz -C dist ."
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3.0-only",
   "devDependencies": {
     "@types/node": "^20.11.24",
     "@types/xml2js": "^0.4.14",
+    "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4",
     "xml2js": "^0.6.2"
   }
 }

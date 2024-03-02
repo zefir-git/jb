@@ -1,4 +1,4 @@
-import LicenseServer from "./LicenseServer.js";
+import LicenseServer from "./LicenseServer";
 
 export default class ServerManager {
     public constructor(public readonly servers: LicenseServer[]) {}

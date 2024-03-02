@@ -1,5 +1,5 @@
 import * as http from "http";
-import ServerManager from "./ServerManager.js";
+import ServerManager from "./ServerManager";
 
 export default class Proxy {
     private readonly server = http.createServer(this.handler.bind(this));
