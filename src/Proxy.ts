@@ -3,12 +3,18 @@ import ServerManager from "./ServerManager";
 
 export default class Proxy {
     private readonly server = http.createServer(this.handler.bind(this));
+    private readonly abortController = new AbortController();
     public constructor(private readonly port: number = 80, private readonly tokens: string[], private readonly servers: ServerManager) {
         console.log("Registered " + this.tokens.length + " token" + (this.tokens.length === 1 ? "" : "s"));
     }
 
     public async start() {
-        await this.servers.check();
+        if (this.abortController.signal.aborted) return;
+        await Promise.race([
+            await this.servers.check(),
+            new Promise(resolve => this.abortController.signal.addEventListener("abort", resolve))
+        ]);
+        if (this.abortController.signal.aborted) return;
         this.server.on("error", err => {
            console.error("error: " + err.message);
            process.exit(1);
@@ -17,8 +23,9 @@ export default class Proxy {
     }
 
     public stop(): Promise<void> {
+        this.abortController.abort();
+        this.servers.stop();
         return new Promise(resolve => {
-            this.servers.stop();
             this.server.close(() => resolve());
         });
     }

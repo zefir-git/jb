@@ -39,5 +39,6 @@ export default class ServerManager {
 
     public stop() {
         clearInterval(this.interval);
+        this.servers.forEach(server => server.abortChecks());
     }
 }

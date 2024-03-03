@@ -77,13 +77,26 @@ export default class LicenseServer {
         this.#lastChecked = new Date();
     }
 
+    private readonly abortControllers: Set<AbortController> = new Set();
+
+    public abortChecks() {
+        for (const abortController of this.abortControllers) {
+            this.abortControllers.delete(abortController);
+            abortController.abort();
+        }
+    }
+
     /**
      * Send a request to check the state of this server.
      */
     public async check(): Promise<void> {
+        const abortController = new AbortController();
+        this.abortControllers.add(abortController);
         const start = Date.now();
         try {
-            const response = await fetch(this.url.href + await LicenseServer.path());
+            const response = await fetch(this.url.href + await LicenseServer.path(), {
+                signal: abortController.signal
+            });
             this.#online = response.ok;
             this.#lastPing = Date.now() - start;
             this.#lastStatus = "connected";
@@ -94,6 +107,9 @@ export default class LicenseServer {
                 this.#lastStatus = "connection error: " + e.message;
             else this.#lastStatus = "connection error: " + e;
             this.#online = false;
+        }
+        finally {
+            this.abortControllers.delete(abortController);
         }
     }
 

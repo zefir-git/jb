@@ -5,6 +5,13 @@ import LicenseServer from "./LicenseServer";
 import Proxy from "./Proxy";
 import ServerManager from "./ServerManager";
 
+let sigintHandler: Function = () => {
+	console.log("Bye!");
+};
+process.on("SIGINT", () => {
+	sigintHandler();
+});
+
 const args = process.argv.slice(2);
 const label = path.basename(process.argv[1]!);
 const info = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf8"));
@@ -129,16 +136,17 @@ async function proxy(port?: string) {
 	}
 
 	const proxyServer = new Proxy(nPort, tokens, new ServerManager(servers));
+	sigintHandler = () => {
+		console.log("\nStopping...");
+		const start = Date.now();
+		proxyServer.stop().then(() => console.log(`Goodbye! (${Date.now() - start}ms)`));
+	};
 	try {
 		proxyServer.start().then();
 	}
 	catch (e: any) {
 		return console.error("${format.bold}error:${format.reset}", e.message);
 	}
-	process.on("SIGINT", async () => {
-		await proxyServer.stop();
-		console.log("\nGoodbye!");
-	});
 }
 
 function version () {
